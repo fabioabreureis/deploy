@@ -1,0 +1,28 @@
+@ 86400 IN SOA {{ domain }}. root.{{ domain }}. (
+20091028 ; serial yyyy-mm-dd
+10800 ; refresh every 15 min
+3600 ; retry every hour
+3600000 ; expire after 1 month +
+86400 ); min ttl of 1 day
+@ 86400 IN NS controller.
+
+erl      A 192.168.0.1
+
+client  A 192.168.0.11
+rgw-node1  A 192.168.0.12
+rgw-node2  A 192.168.0.13
+rgw-node3  A 192.168.0.14
+controller A 192.168.0.15
+compute A 192.168.0.16
+network A 192.168.0.17
+mon1  A 192.168.0.100
+mon2  A 192.168.0.101
+mon3  A 192.168.0.102
+osd1  A 192.168.0.103
+osd2  A 192.168.0.104
+osd3  A 192.168.0.105
+ns1      A 192.168.0.10
+
+region-1 IN CNAME rgw-node1
+region-2 IN CNAME rgw-node2
+region-3 IN CNAME rgw-node3

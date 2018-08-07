@@ -1,0 +1,15 @@
+---
+# handlers file for Bind setup
+- name: restart named
+  service:
+    name: named
+    state: restarted
+
+- name: restart-ntpd
+  action: service name=ntpd state=restarted enabled=yes
+
+- name: restart-sshd
+  action: service name=sshd state=restarted enabled=yes
+
+- name: restart-sysctl
+  action:  command /sbin/sysctl -p

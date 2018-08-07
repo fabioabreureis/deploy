@@ -1,0 +1,48 @@
+---
+  - name: install the RDO Yum Respository for CentOS
+    yum: name=https://www.rdoproject.org/repos/rdo-release.rpm state=present
+
+  - name: Make sure we have yum-utils
+    yum: name=yum-utils state=latest
+
+  - name: install the Packstack from RDO on Centos
+    yum: name=openstack-packstack state=latest
+
+  - name: Disable service NetworkManager
+    service:
+      name: NetworkManager
+      enabled: no
+
+  - name: Stop service NetworkManager
+    service:
+      name: NetworkManager
+      state: stopped
+
+  - name: Make sure we have yum-plugin-priorities
+    yum: name=yum-plugin-priorities state=latest
+
+  - name: Copy packstack answers  
+    template:
+      src: packstack-answers.txt.j2
+      dest: /opt/packstack-answers.txt
+      owner: root
+      group: root
+      mode: 0644
+
+  - name: upgrade all packages
+    yum: name=* state=latest
+
+  - name: Execute Packstack
+    command: packstack --answer-file=/opt/packstack-answers.txt
+
+  - name: Download Cirros Image
+    get_url:
+      url: http://download.cirros-cloud.net/0.3.3/cirros-0.3.3-x86_64-disk.img
+      dest: /etc/cirros-0.3.3-x86_64-disk.img
+      mode: 0644
+
+  - name: Create file for Vagrant process
+    copy:
+      content: ""
+      dest: /opt/opsok
+      mode: 0644

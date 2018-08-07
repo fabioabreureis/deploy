@@ -1,0 +1,13 @@
+client
+compute
+controller
+network
+rgw-node1
+rgw-node2
+rgw-node3
+osd1
+osd2
+osd3
+mon1
+mon2
+mon3

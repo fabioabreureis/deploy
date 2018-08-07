@@ -1,0 +1,28 @@
+$ORIGIN .
+$TTL 604800	; 1 week
+{{ rev_domain }}	IN SOA	{{ ansible_fqdn }}. admin.{{ domain }}. (
+				7          ; serial
+				604800     ; refresh (1 week)
+				86400      ; retry (1 day)
+				2419200    ; expire (4 weeks)
+				604800     ; minimum (1 week)
+				)
+			NS	{{ ansible_fqdn }}.
+$ORIGIN {{ rev_domain }}.
+$TTL 604800	; 1 week
+1     PTR erl.{{ rev_domain }}.
+11    PTR ns1.{{ rev_domain }}.11    
+11    PTR client.{{ rev_domain }}.
+12    PTR rgw-node1.{{ rev_domain }}.
+13    PTR rgw-node2.{{ rev_domain }}.
+14    PTR rgw-node3.{{ rev_domain }}.
+15    PTR controller.{{ rev_domain }}.
+16    PTR compute.{{ rev_domain }}.
+17    PTR network.{{ rev_domain }}.
+100   PTR mon1.{{ rev_domain }}.
+101   PTR mon2.{{ rev_domain }}.
+102   PTR mon3.{{ rev_domain }}.
+103   PTR osd1.{{ rev_domain }}.
+104   PTR osd2.{{ rev_domain }}.
+105   PTR osd3.{{ rev_domain }}.
+

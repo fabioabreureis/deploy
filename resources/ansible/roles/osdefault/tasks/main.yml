@@ -1,0 +1,33 @@
+---
+# tasks file for Bind setup
+- name: Install bind utils
+  yum:
+    pkg: bind-utils
+    state: installed
+
+- name: Copy inventory conf file
+  template:
+    src: inventory.j2
+    dest: /opt/inventory.conf
+    mode: 0644
+
+- selinux:
+    policy: targeted
+    state: permissive
+
+
+- name: Install ntp
+  action: yum name=ntp state=present
+
+- name: Set timezone
+  shell: timedatectl set-timezone America/Sao_Paulo
+
+- template: src={{item.src}} dest={{item.dest}}
+  with_items:
+    - { src: 'resolv.conf.j2', dest: '/etc/resolv.conf' }
+    - { src: 'ntpd.conf.j2', dest: '/etc/ntp.conf' }
+    - { src: 'ssh.j2', dest: '/etc/ssh/sshd_config' }
+
+  notify:
+    - restart-ntpd
+    - restart-sshd

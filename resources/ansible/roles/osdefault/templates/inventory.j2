@@ -1,0 +1,32 @@
+client     ansible_ssh_host={{ network }}.11 ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+controller ansible_ssh_host={{ network }}.15 ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+compute    ansible_ssh_host={{ network }}.16 ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+network  ansible_ssh_host={{ network }}.17 ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+rgw-node1  ansible_ssh_host={{ network }}.12 ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+rgw-node2  ansible_ssh_host={{ network }}.13 ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+rgw-node3  ansible_ssh_host={{ network }}.14 ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+mon1  ansible_ssh_host={{ network }}.100 ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+mon2  ansible_ssh_host={{ network }}.101 ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+mon3  ansible_ssh_host={{ network }}.102 ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+osd1  ansible_ssh_host={{ network }}.103 ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+osd2  ansible_ssh_host={{ network }}.104 ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+osd3  ansible_ssh_host={{ network }}.105 ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+
+
+[main_group:children]
+sshkey
+
+[sshkey]
+client
+controller
+compute
+network
+rgw-node1
+rgw-node2
+rgw-node3
+mon1
+mon2
+mon3
+osd1
+osd2
+osd3
