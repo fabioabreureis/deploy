@@ -16,6 +16,18 @@
     state: permissive
 
 
+- name: Disable service NetworkManager
+  service:
+    name: NetworkManager
+    enabled: no
+
+- name: Stop service NetworkManager
+  service:
+    name: NetworkManager
+    state: stopped
+
+
+
 - name: Install ntp
   action: yum name=ntp state=present
 

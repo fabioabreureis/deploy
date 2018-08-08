@@ -12,7 +12,7 @@
     owner: root
     group: named
     mode: 0660
-  notify: restart named
+  notify: restart-named
 
 - name: Make named directory
   file:
@@ -29,7 +29,7 @@
     owner: root
     group: named
     mode: 0640
-  notify: restart named
+  notify: restart-named
 
 
 - name: Make zones Directory
@@ -47,7 +47,7 @@
     owner: root
     group: named
     mode: 0640
-  notify: restart named
+  notify: restart-named
 
 - name: Copy reverse file
   template:
@@ -56,7 +56,7 @@
     owner: root
     group: named
     mode: 0640
-  notify: restart named
+  notify: restart-named
 
 
 - name: Install bind utils
@@ -73,6 +73,17 @@
 - selinux:
     policy: targeted
     state: permissive
+
+- name: Disable service NetworkManager
+  service:
+    name: NetworkManager
+    enabled: no
+
+- name: Stop service NetworkManager
+  service:
+    name: NetworkManager
+    state: stopped
+
 
 
 - name: Install ntp

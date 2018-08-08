@@ -32,8 +32,9 @@
   - name: upgrade all packages
     yum: name=* state=latest
 
-  - name: Execute Packstack
+  - name: Execute Packstack script
     command: packstack --answer-file=/opt/packstack-answers.txt
+
 
   - name: Download Cirros Image
     get_url:

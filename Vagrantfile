@@ -5,8 +5,8 @@ network = '192.168.0'
 
 nodes = [
 { :hostname => 'client', :ip => "#{network}.10" },
-{ :hostname => 'controller', :ip => "#{network}.15" , :ram => 1024, :packstack => 'yes'  },
-{ :hostname => 'compute', :ip => "#{network}.16", :cpu => 2 , :ram => 2048, :ops => 'yes' },
+{ :hostname => 'controller', :ip => "#{network}.15" , :ram => 1024, :packstack => 'yes' , :cephdeploy: 'yes' },
+{ :hostname => 'compute', :ip => "#{network}.16", :cpu => 2 , :ram => 2048 },
 { :hostname => 'network', :ip => "#{network}.17", :ram => 1024 },
 { :hostname => 'mon1', :ip => "#{network}.100" },
 { :hostname => 'mon2', :ip => "#{network}.101" },
@@ -35,15 +35,21 @@ Vagrant.configure("2") do |config|
 			config.vm.provision "shell", inline: "sudo /vagrant/resources/shell.sh"
 			nodeconfig.vm.provision "shell", path: "post.sh" ,run: "always"
                      
+			 if node[:hostname] == "controller"
+                                 config.vm.network "forwarded_port", guest: 80, host: 80
+                        end
+
+			 if node[:hostname] == "mon1"
+                                 config.vm.network "forwarded_port", guest: 7789, host: 7789
+                        end
 
 			if node[:packstack] == "yes"
-#			config.vm.provision "shell", inline: " ansible-playbook /vagrant/resources/ansible/packstack.yml"
+				config.vm.provision "shell", inline: " ansible-playbook /vagrant/resources/ansible/packstack.yml"
 			end
 			
 			if node[:osp] == "yes"
   				  config.disksize.size = '80GB'
 				end
-			config.vm.provision "shell", inline: " ansible-playbook /vagrant/resources/ansible/default.yml"
 			if node[:osd] == "yes"
 				vb.customize ["storagectl", :id, "--add", "sata", "--name", "OSD" , "--portcount", 4, "--hostiocache", "on"]
 				vb.customize [ "createhd", "--filename", "disk_osd1-#{node[:hostname]}", "--size", "5192" ]
