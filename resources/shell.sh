@@ -9,7 +9,7 @@ if [ $hostname == controller ]; then
                         sshpass -p "vagrant" ssh-copy-id -f -o StrictHostKeyChecking=no root@$i
 
 sudo -kSs << EOF
-sshpass -p "vagrant" ssh-copy-id -f -o StrictHostKeyChecking=no root@$i
+sshpass -p "vagrant" $keydir/ssh-copy-id -f -o StrictHostKeyChecking=no root@$i
 EOF
                 done
 fi
