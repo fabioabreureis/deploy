@@ -1,6 +1,20 @@
 Ceph Brasil Laboratory
 ======================
 
+## Requirements
+
+Hardware for the lab : 
+
+* 8 Gb de RAM 
+* 2 Core CPU 
+
+
+A computer with these tools installed : 
+
+* Vagrant and plugin hostname manager <https://www.vagrantup.com/downloads.html>
+* Virtual Box <https://www.virtualbox.org/wiki/Downloads>
+
+
 ## Introduction
 
 This lab make a provision of these components : 
