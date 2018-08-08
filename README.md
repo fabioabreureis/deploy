@@ -25,7 +25,7 @@ Into the directory resources we have all scripts and playbook involved with prov
 ![Alt text](ceph-brasil-lab.png?raw=true "Lab Ceph Brasil")
 
 
-The ssh access is from the controller server, if you need up a Ceph Lab you need provision the mons, osds and controller vms. 
+The ssh access is from the controller server with ssh user key of vagrant or root, if you need up a Ceph Lab you need provision the mons, osds and controller vms for example.  
 
 
  
