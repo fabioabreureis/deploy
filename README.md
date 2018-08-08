@@ -14,7 +14,7 @@ This lab make a provision of these components :
 We can controll some behaviours if set the variable into the Vagrantfile : 
 
 * packstack - yes = start the packstack deploy during the vm provision. 
-* cephdeploy - yes = start the packstack deploy during the vm provision. 
+* cephdeploy - yes = start the packstack deploy during the vm provision. <= Not implemented at this time
 
 
 Into the directory resources we have all scripts and playbooks involved with provision of machines.
