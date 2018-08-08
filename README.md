@@ -17,7 +17,7 @@ We can controll some behaviours if set the variable into the Vagrantfile :
 * cephdeploy - yes = start the packstack deploy during the vm provision. 
 
 
-Into the directory resources we have all scripts and playbook involved with provision of machines.
+Into the directory resources we have all scripts and playbooks involved with provision of machines.
 
 
 ## Topology 
@@ -25,7 +25,7 @@ Into the directory resources we have all scripts and playbook involved with prov
 ![Alt text](ceph-brasil-lab.png?raw=true "Lab Ceph Brasil")
 
 
-The ssh access is from the controller server with ssh user key of vagrant or root, if you need up a Ceph Lab you need provision the mons, osds and controller vms for example.  
+The ssh access is from the controller server with ssh user key of vagrant or root, if you need up a Ceph Lab, you need provision the mons, osds and controller vms for example.  
 
 
  
