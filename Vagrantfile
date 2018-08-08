@@ -5,7 +5,7 @@ network = '192.168.0'
 
 nodes = [
 { :hostname => 'client', :ip => "#{network}.10" },
-{ :hostname => 'controller', :ip => "#{network}.15" , :ram => 1024, :packstack => 'yes' , :cephdeploy: 'yes' },
+{ :hostname => 'controller', :ip => "#{network}.15" , :ram => 1024, :packstack => 'yes' , :cephdeploy => 'yes' },
 { :hostname => 'compute', :ip => "#{network}.16", :cpu => 2 , :ram => 2048 },
 { :hostname => 'network', :ip => "#{network}.17", :ram => 1024 },
 { :hostname => 'mon1', :ip => "#{network}.100" },
