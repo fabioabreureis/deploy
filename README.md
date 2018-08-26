@@ -1,6 +1,20 @@
 Ceph Brasil Laboratory
 ======================
 
+## Requirements
+
+Hardware for the lab : 
+
+* 8 Gb de RAM 
+* 2 Core CPU 
+
+
+A computer with these tools installed : 
+
+* Vagrant and plugin hostname manager <https://www.vagrantup.com/downloads.html>
+* Virtual Box <https://www.virtualbox.org/wiki/Downloads>
+
+
 ## Introduction
 
 This lab make a provision of these components : 
@@ -14,7 +28,7 @@ This lab make a provision of these components :
 We can controll some behaviours if set the variable into the Vagrantfile : 
 
 * packstack - yes = start the packstack deploy during the vm provision. 
-* cephdeploy - yes = start the packstack deploy during the vm provision. 
+* cephdeploy - yes = start the packstack deploy during the vm provision. <= Not implemented at this time
 
 
 Into the directory resources we have all scripts and playbooks involved with provision of machines.

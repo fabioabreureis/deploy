@@ -6,22 +6,24 @@
 86400 ); min ttl of 1 day
 @ 86400 IN NS controller.
 
-erl      A 192.168.0.1
+erl      A {{ network }}.1
 
-client  A 192.168.0.11
-rgw-node1  A 192.168.0.12
-rgw-node2  A 192.168.0.13
-rgw-node3  A 192.168.0.14
-controller A 192.168.0.15
-compute A 192.168.0.16
-network A 192.168.0.17
-mon1  A 192.168.0.100
-mon2  A 192.168.0.101
-mon3  A 192.168.0.102
-osd1  A 192.168.0.103
-osd2  A 192.168.0.104
-osd3  A 192.168.0.105
-ns1      A 192.168.0.10
+client  A {{ network }}.11
+rgw-node1  A {{ network }}.12
+rgw-node2  A {{ network }}.13
+rgw-node3  A {{ network }}.14
+deploy A {{ network }}.114
+controller A {{ network }}.115
+compute1 A {{ network }}.116
+compute2 A {{ network }}.117
+network A {{ network }}.118
+mon1  A {{ network }}.100
+mon2  A {{ network }}.101
+mon3  A {{ network }}.102
+osd1  A {{ network }}.103
+osd2  A {{ network }}.104
+osd3  A {{ network }}.105
+ns1      A {{ network }}.10
 
 region-1 IN CNAME rgw-node1
 region-2 IN CNAME rgw-node2

@@ -1,5 +1,5 @@
 ---
 # vars file for Bind setup
 network: 192.168.0
-nameserver: 192.168.0.15
+nameserver: 192.168.0.115
 domain: lab.cephbrasil.com

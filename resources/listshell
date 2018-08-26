@@ -1,5 +1,6 @@
 client
-compute
+compute1
+compute2
 controller
 network
 rgw-node1

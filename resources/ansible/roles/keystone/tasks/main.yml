@@ -1,0 +1,52 @@
+---
+- name: Install pkg
+  yum:
+    pkg: "{{ item }}"
+    state: installed
+  with_items:
+    - openstack-keystone
+    - openstack-utils
+    - python-openstackclient 
+    - httpd 
+    - mod_wsgi 
+
+- name: Copy keystone conf file
+  template:
+    src: keystone.conf.j2
+    dest: /etc/keystone/keystone.conf
+    owner: root
+    group: named
+    mode: 0644
+
+- name: Copy wsgi keystone conf file
+  template:
+    src: wsgi-keystone.conf.j2
+    dest: /etc/httpd/conf.d/wsgi-keystone
+    owner: root
+    group: named
+    mode: 0644
+  notify: restart-httpd
+
+
+-  command: sudo usermod -s /bin/bash keystone
+
+- name: Keystone Db Sync
+  command:  su -s /bin/bash keystone -c "keystone-manage db_sync"
+
+-  command: sudo usermod -s /bin/nologin keystone
+
+- command: keystone-manage fernet_setup --keystone-user keystone --keystone-group keystone 
+- command: keystone-manage credential_setup --keystone-user keystone --keystone-group keystone 
+- command:  keystone-manage bootstrap --bootstrap-password {{ keystonepass }} --bootstrap-admin-url http://{{ controller }}:5000/v3/ --bootstrap-internal-url http://{{ controller }}:5000/v3/ --bootstrap-public-url http://{{ controller }}:5000/v3/ --bootstrap-region-id RegionOne 
+
+- name: Create openstack directory 
+  file:
+    path: /etc/openstack
+    state: directory
+
+- name : Create /etc/openstack/clouds.yml file 
+  template: src=clouds.yml.j2 dest=/etc/openstack/clouds.yml
+
+- name : Create Service Project
+  command: openstack --os-cloud "{{ cloudname }}" project create --domain default --description "Service Project" service 
+

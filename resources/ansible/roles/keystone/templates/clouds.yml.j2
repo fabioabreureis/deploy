@@ -1,0 +1,9 @@
+clouds:
+  {{ cloudname }}:
+    region_name: RegionOne
+    auth:
+      username: admin
+      password: {{ keystonepass }} 
+      project_name: admin
+      domain_id: default
+      auth_url: 'http://{{ controller }}:35357/v3'

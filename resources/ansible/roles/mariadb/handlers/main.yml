@@ -1,0 +1,6 @@
+---
+# handlers file for MariaDB setup
+- name: restart-mariadb
+  service:
+    name: mariadb
+    state: restarted

@@ -1,0 +1,250 @@
+#!/bin/bash
+
+#!/bin/bash
+source /vagrant/resources/controller.cfg
+
+
+function packages(){
+yum -y install epel-release.noarch centos-release-openstack-queens  && \
+yum --enablerepo=centos-openstack-queens -y install mariadb-server &&  \
+yum --enablerepo=centos-openstack-queens,epel -y install openstack-keystone openstack-utils python-openstackclient httpd mod_wsgi
+yum --enablerepo=epel -y install rabbitmq-server memcached
+yum --enablerepo=centos-openstack-queens,epel -y install openstack-glance
+
+}
+
+#Install RabbitMQ
+function rabbit_configure() {
+systemctl start rabbitmq-server memcached && \
+systemctl enable rabbitmq-server memcached && \
+rabbitmqctl add_user openstack password && \
+rabbitmqctl set_permissions openstack ".*" ".*" ".*"
+
+if [ $FIREWALLD == yes ]; then
+ firewall-cmd --add-port={11211/tcp,5672/tcp} --permanent
+ firewall-cmd --reload
+fi
+
+}
+
+function mysql_start(){
+systemctl start mariadb &&  \
+#MySQL Adjusts
+mysqladmin -u root password "$DATABASE_PASS"
+mysql -u root -p"$DATABASE_PASS" -e "UPDATE mysql.user SET Password=PASSWORD('$DATABASE_PASS') WHERE User='root'"
+mysql -u root -p"$DATABASE_PASS" -e "DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1')"
+mysql -u root -p"$DATABASE_PASS" -e "DELETE FROM mysql.user WHERE User=''"
+mysql -u root -p"$DATABASE_PASS" -e "DELETE FROM mysql.db WHERE Db='test' OR Db='test\_%'"
+mysql -u root -p"$DATABASE_PASS" -e "FLUSH PRIVILEGES"
+
+grep "bind-address" /etc/my.cnf
+if [ $? == 1 ]; then
+echo "bind-address='${MYSQLHOST}'" >> /etc/my.cnf
+systemctl restart mariadb
+else
+echo "mysql bind is set"
+fi
+
+if [ $FIREWALLD == yes ]; then
+ firewall-cmd --add-port={3306/tcp} --permanent
+ firewall-cmd --reload
+fi
+
+}
+
+function mysql_keystone(){
+mysqlshow -u root -p$DATABASE_PASS | grep keystone;
+if [ $? == 1 ]; then
+mysql -u root -p$DATABASE_PASS <<KEYSTONEDB
+CREATE DATABASE keystone;
+GRANT ALL ON keystone.* TO 'keystone'@'localhost' IDENTIFIED BY '$KEYSTONEDBPASS';
+GRANT ALL ON keystone.* TO 'keystone'@'%' IDENTIFIED BY '$KEYSTONEDBPASS';
+FLUSH PRIVILEGES;
+KEYSTONEDB
+else
+echo "keystone database exist"
+fi
+}
+
+function keystone_configure(){
+mysqlshow -u root -p$DATABASE_PASS | grep keystone;
+if [ $? == 0 ]; then
+		su -s /bin/bash keystone -c "keystone-manage db_sync" && \
+                keystone-manage fernet_setup --keystone-user keystone --keystone-group keystone
+                keystone-manage credential_setup --keystone-user keystone --keystone-group keystone
+                keystone-manage bootstrap --bootstrap-password keystone \
+                --bootstrap-admin-url http://$CONTROLLER:5000/v3/ \
+                --bootstrap-internal-url http://$CONTROLLER:5000/v3/ \
+                --bootstrap-public-url http://$CONTROLLER:5000/v3/ \
+                --bootstrap-region-id RegionOne
+                else
+                echo "The keystone database not exist "
+                fi
+
+if [ $SELINUX == yes ]; then
+setsebool -P httpd_use_openstack on
+setsebool -P httpd_can_network_connect on
+setsebool -P httpd_can_network_connect_db on
+fi
+
+cp -Rv /etc/keystone/keystone.conf /etc/keystone/keystone.conf.ORIG$(date)
+cp -Rv /vagrant/resources/templates/keystone.conf /etc/keystone
+cp -Rv /vagrant/resources/templates/wsgi-keystone.conf /etc/httpd/conf.d
+sed -i 's/CONTROLLER/'${CONTROLLER}'/g' /etc/httpd/conf.d/wsgi-keystone.conf
+sed -i 's/KEYSTONEPASSVAR/'$KEYSTONEDBPASS'/g' /etc/keystone/keystone.conf
+sed -i 's/MYSQLVARHOST/'$MYSQLHOST'/g' /etc/keystone/keystone.conf
+
+
+if [ $? == 0 ]; then
+systemctl start httpd
+systemctl enable
+fi
+
+if [ -f /tmp/keystone.rc ]; then
+echo "keystone source file exist"
+else
+cat >/tmp/keystone.rc<<KEYSTONEFILE
+export OS_PROJECT_DOMAIN_NAME=default
+export OS_USER_DOMAIN_NAME=default
+export OS_PROJECT_NAME=admin
+export OS_USERNAME=admin
+export OS_PASSWORD=keystone
+export OS_AUTH_URL=http://'${CONTROLLER}':5000/v3
+export OS_IDENTITY_API_VERSION=3
+export OS_IMAGE_API_VERSION=2
+export PS1='[\u@\h \W(keystone)]\$ '
+KEYSTONEFILE
+echo "The Keystone source file : /tmp/keystone.rc"
+fi
+
+openstack project list | grep service
+if [ $? == 1 ] ; then
+openstack project create --domain default --description "Service Project" service
+else
+echo "project service exist"
+fi
+if [ $? == 0 ] ; then
+echo "Endpoint is ok"
+else
+echo "Endpoint error - check the deployment"
+fi 
+
+}
+
+function mysql_glance(){
+
+mysqlshow -u root -p$DATABASE_PASS | grep glance
+if [ $? == 1 ]; then
+mysql -u root -p$DATABASE_PASS <<GLANCEDB
+CREATE DATABASE glance;
+GRANT ALL ON glance.* TO 'glance'@'localhost' IDENTIFIED BY '$GLANCEDBPASS';
+GRANT ALL ON glance.* TO 'glance'@'%' IDENTIFIED BY '$GLANCEDBPASS';
+FLUSH PRIVILEGES;
+GLANCEDB
+else
+echo "glance database exist"
+fi
+}
+
+function glance_configure(){
+
+if [ -f /tmp/keystone.rc ]; then
+echo "keystone source file exist"
+else
+cat >/tmp/keystone.rc<<KEYSTONEFILE
+export OS_PROJECT_DOMAIN_NAME=default
+export OS_USER_DOMAIN_NAME=default
+export OS_PROJECT_NAME=admin
+export OS_USERNAME=admin
+export OS_PASSWORD=keystone
+export OS_AUTH_URL=http://'${CONTROLLER}':5000/v3
+export OS_IDENTITY_API_VERSION=3
+export OS_IMAGE_API_VERSION=2
+export PS1='[\u@\h \W(keystone)]\$ '
+KEYSTONEFILE
+echo "The Keystone source file : /tmp/keystone.rc"
+fi
+
+openstack user list | grep glance 
+if [ $? == 1 ]; then
+ openstack user create --domain default --project service --password glance glance 
+else 
+echo "Glance user exist"
+fi 
+openstack service list | grep glance 
+if [ $? == 1 ]; then
+ openstack role add --project service --user glance admin 
+ openstack service create --name glance --description "OpenStack Image service" image 
+else 
+echo "Service Glance exist"
+fi 
+
+openstack endpoint list | grep glance
+if [ $? == 1 ]; then
+openstack role add --project service --user glance admin
+openstack service create --name glance --description "OpenStack Image service" image
+openstack endpoint create --region RegionOne image public http://$CONTROLLER:9292
+openstack endpoint create --region RegionOne image internal http://$CONTROLLER:9292
+openstack endpoint create --region RegionOne image admin http://$CONTROLLER:9292
+else
+echo "Endpoint glance exist"
+fi
+
+rm -rf /etc/glance/glance-api.conf.ORIG*
+cp -Rv /etc/glance/glance-api.conf /etc/glance/glance-api.conf.ORIG$(date)
+rm -rf /etc/glance/glance-api.registry.ORIG*
+cp -Rv /etc/glance/glance-registry.conf /etc/glance/glance-registry.conf.ORIG$(date)
+cp -Rv /vagrant/resources/templates/glance-api.conf /etc/glance
+cp -Rv /vagrant/resources/templates/glance-registry.conf /etc/glance
+
+sed -i 's/GLANCEPASSVAR/'$GLANCEDBPASS'/g' /etc/glance/glance-registry.conf && \
+sed -i 's/CONTROLLER/'$CONTROLLER'/g' /etc/glance/glance-registry.conf && \
+sed -i 's/MYSQLVARHOST/'$MYSQLHOST'/g' /etc/glance/glance-registry.conf
+
+mysqlshow -u root -p$DATABASE_PASS | grep glance;
+if [ $? == 0 ]; then
+su -s /bin/bash glance -c "glance-manage db_sync"
+fi
+
+
+
+if [ $SELINUX == yes ]; then
+setsebool -P glance_api_can_network on
+fi
+if [ $FIREWALLD == yes ]; then
+firewall-cmd --add-port={9191/tcp,9292/tcp} --permanent
+firewall-cmd --reload
+fi
+
+if [ $? == 0 ]; then
+systemctl restart httpd
+systemctl enable openstack-glance-api.service   openstack-glance-registry.service
+systemctl restart openstack-glance-api.service   openstack-glance-registry.service
+fi
+
+chmod 640 /etc/glance/glance-api.conf /etc/glance/glance-registry.conf
+ chown root:glance /etc/glance/glance-api.conf /etc/glance/glance-registry.conf
+
+if [ -f /opt/cirros-0.3.4-x86_64-disk.img ]; then
+openstack image create "cirros"   --file cirros-0.3.4-x86_64-disk.img --disk-format qcow2 --container-format bare --public
+fi
+
+if [ $? == 0 ]; then
+echo "Glance is ok"
+else
+echo "Glance Error"
+fi
+
+}
+
+packages
+rabbit_configure
+mysql_start
+mysql_keystone
+keystone_configure
+mysql_glance
+glance_configure
+
+
+
+

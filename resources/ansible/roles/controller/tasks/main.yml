@@ -1,9 +1,12 @@
 ---
-# tasks file for Bind setup
-- name: Install bind
+- name: Install pkgs
   yum:
-    pkg: bind
+    pkg: "{{ item }}"
     state: installed
+  with_items: 
+    - bind
+    - centos-release-openstack-queens 
+    - epel-release.noarch
 
 - name: Copy named conf file
   template:
@@ -83,8 +86,6 @@
   service:
     name: NetworkManager
     state: stopped
-
-
 
 - name: Install ntp
   action: yum name=ntp state=present

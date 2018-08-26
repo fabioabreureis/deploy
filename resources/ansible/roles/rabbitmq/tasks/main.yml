@@ -1,0 +1,28 @@
+---
+- name: Install pkg
+  yum:
+    pkg: "{{ item }}"
+    state: installed
+  with_items:
+    - rabbitmq-server
+    - memcached
+
+- name: RabbitMQ start
+  systemd:
+    state: started
+    name: rabbitmq-server
+    enabled: yes
+
+- name: Memcached start
+  systemd:
+    state: started
+    name: memcached
+    enabled: yes
+
+- name: RabbitMQ create openstack user
+  command: rabbitmqctl add_user openstack password 
+  ignore_errors: True
+
+- name: RabbitMQ set openstack permissions
+  command: rabbitmqctl set_permissions openstack ".*" ".*" ".*"
+  ignore_errors: True

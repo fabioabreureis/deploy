@@ -1,0 +1,108 @@
+---
+cidr_networks:
+  management: 172.29.236.0/24
+  tunnel: 172.29.240.0/24
+  storage: 172.29.244.0/24
+
+used_ips:
+  - 172.29.236.101,172.29.236.117
+  - 172.29.240.101,172.29.240.117
+
+global_overrides:
+  internal_lb_vip_address: 172.29.236.115
+  external_lb_vip_address: 192.168.0.115
+  lb_name: haproxy
+  tunnel_bridge: "br-vxlan"
+  management_bridge: "br-mgmt"
+  provider_networks:
+    - network:
+        group_binds:
+          - all_containers
+          - hosts
+        type: "raw"
+        container_bridge: "br-mgmt"
+        container_interface: "eth3:1"
+        container_type: "veth"
+        ip_from_q: "management"
+        is_container_address: true
+        is_ssh_address: true
+    - network:
+        group_binds:
+          - neutron_linuxbridge_agent
+        container_bridge: "br-vxlan"
+        container_type: "veth"
+        container_interface: "eth4:1"
+        ip_from_q: "tunnel"
+        type: "vxlan"
+        range: "1:1000"
+        net_name: "vxlan"
+    - network:
+        group_binds:
+          - neutron_linuxbridge_agent
+        container_bridge: "br-vlan"
+        container_type: "veth"
+        container_interface: "eth4"
+        type: "vlan"
+        range: "1:1"
+        net_name: "vlan"
+    - network:
+        group_binds:
+          - neutron_linuxbridge_agent
+        container_bridge: "br-vlan"
+        container_type: "veth"
+        container_interface: "eth4"
+        host_bind_override: "eth4"
+        type: "flat"
+        net_name: "flat"
+
+
+# Shared infrastructure parts
+shared-infra_hosts:
+  controller:
+    ip: 172.29.236.115
+
+# OpenStack Compute infrastructure parts
+os-infra_hosts:
+  controller:
+    ip: 172.29.236.115
+
+# OpenStack Storage infrastructure parts
+storage-infra_hosts:
+  controller:
+    ip: 172.29.236.115
+
+# Keystone Identity infrastructure parts
+identity_hosts:
+  controller:
+    ip: 172.29.236.115
+
+# User defined Compute Hosts, this should be a required group
+compute_hosts:
+  compute1:
+    ip: 172.29.236.116
+  compute2:
+    ip: 172.29.236.117
+
+storage_hosts:
+  cinder:
+    ip: 172.29.236.115
+    container_vars:
+      cinder_backends:
+        limit_container_types: cinder_volume
+        lvm:
+          volume_group: cinder-volumes
+          volume_driver: cinder.volume.drivers.lvm.LVMISCSIDriver
+          volume_backend_name: LVM_iSCSI
+
+network_hosts:
+  network:
+    ip: 172.29.236.118
+
+# horizon
+dashboard_hosts:  
+  controller:
+    ip: 172.29.236.115
+
+haproxy_hosts:
+  haproxy:
+    ip: 172.29.236.115

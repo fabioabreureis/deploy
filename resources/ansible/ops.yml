@@ -4,6 +4,4 @@
   become_method: sudo
   become_user: root 
   roles:
-    - controller
-    - rabbitmq
-    - keystone
+    - openstack-prep

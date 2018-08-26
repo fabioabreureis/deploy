@@ -1,0 +1,60 @@
+---
+- name: Install MariaDB
+  yum: name={{item}} state=present
+  with_items:
+   - MySQL-python
+   - mariadb
+   - mariadb-server
+
+- name: Start service MariaDB, if not running
+  service:
+    name: mariadb
+    state: started
+
+
+- include: secure.yml
+
+- name: Copy my.cnf file
+  template:
+    src: my.cnf.j2
+    dest: /etc/my.cnf
+    owner: mysql
+    group: mysql
+    mode: 0640
+    backup: yes
+  notify: restart-mariadb
+ 
+- name: Create keystone database
+  mysql_db:
+    name: "{{ item }}"
+    state: present
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
+  with_items:
+   - "keystone"
+   - "glance"
+   - "nova"
+   - "nova_api"
+   - "nova_placement"
+   - "nova_cell10"
+   - "neutron_ml2"
+   - "cinder"
+
+- name: Create user db
+  mysql_user:
+   name: "{{ item.user }}"
+   password: "{{ item.pass }}"
+   priv: "{{ item.priv }}"
+   host: "{{ item.host }}"
+   login_user: root
+   login_password: "{{ mysql_root_password }}"
+   state: present
+  with_items: 
+    - { user: 'keystone' , pass: 'keystone' , priv: 'keystone.*:ALL' , host: '%' }
+    - { user: 'glance' , pass: 'glance' , priv: 'glance.*:ALL' , host: '%' }
+    - { user: 'nova' , pass: 'nova' , priv: 'nova.*:ALL' , host: '%' }
+    - { user: 'nova_api' , pass: 'nova_api' , priv: 'nova_api.*:ALL' , host: '%' }
+    - { user: 'nova_placement' , pass: 'nova_placement' , priv: 'nova_placement.*:ALL' , host: '%' }
+    - { user: 'nova_cell10' , pass: 'nova_cell10' , priv: 'nova_cell10.*:ALL' , host: '%' }
+    - { user: 'neutron_ml2' , pass: 'neutron_ml2' , priv: 'neutron_ml2.*:ALL' , host: '%' }
+    - { user: 'cinder' , pass: 'cinder' , priv: 'cinder.*:ALL' , host: '%' } 

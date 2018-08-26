@@ -1,0 +1,5 @@
+---
+# vars file for Bind setup
+mysql_root_password: redhat
+keystonedbpass: redhat
+bind: 172.29.236.115

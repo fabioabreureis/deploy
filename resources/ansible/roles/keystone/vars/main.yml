@@ -1,0 +1,7 @@
+---
+cloudname: lab
+keystonedbpass: keystone
+keystonepass: keystone
+controller: 172.29.236.115
+memcachehost: 172.29.236.115
+mysqlhost: 172.29.236.115
