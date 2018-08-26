@@ -1,12 +1,10 @@
-#!/bin/bash 
+#/bin/bash 
 hostname=$(hostname)
 resources="/vagrant/resources"
 
 if [ ! -f ~/runonce ]; then 
 
 	if [ $hostname == controller ]; then 
-	ansible-playbook $resources/ansible/mariadb.yml
-
 	sudo $resources/network.sh 115
 	sleep 5
 	ansible-playbook $resources/ansible/controller.yml

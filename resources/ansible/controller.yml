@@ -5,5 +5,3 @@
   become_user: root 
   roles:
     - controller
-    - rabbitmq
-    - keystone
