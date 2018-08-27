@@ -28,9 +28,9 @@ nodes = [
 { :hostname => 'mon1', :ip => "#{network}.100" , :ip2 => "#{stornet}.100"  },
 { :hostname => 'mon2', :ip => "#{network}.101" , :ip2 => "#{stornet}.101"  },
 { :hostname => 'mon3', :ip => "#{network}.102" , :ip2 => "#{stornet}.102"  },
-{ :hostname => 'osd1', :ip => "#{network}.103" , :ip2 => "#{stornet}.12"  , :ram => 512, :osd => 'yes' },
-{ :hostname => 'osd2', :ip => "#{network}.104", :ip2 => "#{stornet}.12"  , :ram => 512, :osd => 'yes' },
-{ :hostname => 'osd3', :ip => "#{network}.105", :ip2 => "#{stornet}.12"  , :ram => 512, :osd => 'yes' }]
+{ :hostname => 'osd1', :ip => "#{network}.103" , :ip2 => "#{stornet}.103"  , :ram => 512, :osd => 'yes' },
+{ :hostname => 'osd2', :ip => "#{network}.104", :ip2 => "#{stornet}.103"  , :ram => 512, :osd => 'yes' },
+{ :hostname => 'osd3', :ip => "#{network}.105", :ip2 => "#{stornet}.103"  , :ram => 512, :osd => 'yes' }]
 
 
 Vagrant.configure("2") do |config|

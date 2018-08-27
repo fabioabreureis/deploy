@@ -10,12 +10,9 @@ if [ $hostname == controller ]; then
 fi
 }
 
-
-if [ $hostname == controller ]; then
-        cp -Rv /vagrant/resources/keys/* /home/vagrant/.ssh/
-        sudo chown -R vagrant /home/vagrant/.ssh
-        sudo chmod 600  /home/vagrant/.ssh/id_rsa
-fi
+cp -Rv /vagrant/resources/keys/* /home/vagrant/.ssh/
+sudo chown -R vagrant /home/vagrant/.ssh
+sudo chmod 600  /home/vagrant/.ssh/id_rsa
 
 cat $keydir/id_rsa.pub >> /home/vagrant/.ssh/known_hosts
 cat $keydir/id_rsa.pub >> /home/vagrant/.ssh/authorized_keys

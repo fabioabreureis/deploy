@@ -27,4 +27,5 @@ if [ ! -f ~/runonce ]; then
 
   touch ~/runonce
 	fi
+sudo $resources/shell.sh
 fi 
