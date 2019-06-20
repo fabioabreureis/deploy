@@ -2,13 +2,6 @@
 # vi: set ft=ruby :
 
 
-# Interfaces
-# eth0 - nat (used by VMware/VirtualBox)
-# eth1 - br-mgmt (Container) 172.29.236.0/24
-# eth2 - br-vlan (Neutron VLAN network) 0.0.0.0/0
-# eth3 - host / API 192.168.100.0/24
-# eth4 - br-vxlan (Neutron VXLAN Tunnel network) 172.29.240.0/24
-
 network = '192.168.0'	
 stornet = '10.10.10'
 brmgmt = '172.29.236'
@@ -37,7 +30,7 @@ Vagrant.configure("2") do |config|
 		nodes.each do |node|
 			config.vm.define node[:hostname] do |nodeconfig|
 				nodeconfig.vm.box = "centos/7"
-                                nodeconfig.vm.box_version = "1803.01"
+                                nodeconfig.vm.box_version = "1902.01"
 				nodeconfig.vm.hostname = node[:hostname]
 				nodeconfig.vm.network :private_network, ip: node[:ip]
 				nodeconfig.vm.network :private_network, ip: node[:ip2]
